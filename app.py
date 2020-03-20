@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import urllib.request
 from PIL import Image
 import math
+import random
 
 load_dotenv()
 
@@ -54,7 +55,21 @@ def stitchig():
     result=Image.new('RGB',(150*n,150*n),(255,255,255))
     x=[0]*n
     y=[0]*n
-    
+    for i in range(n):
+        x[i]=i
+        y[i]=i
+    while(len(imgArray)!=0):
+        a=random.randint(0,len(x)-1)
+        b=random.randint(0,len(y)-1)
+        c=random.randint(0,len(imgArray)-1)
+        imgToPaste=imgArray[c]
+        xpos=x[a]
+        ypos=y[b]
+        x.pop(a)
+        y.pop(b)
+        imgArray.pop(c)
+        result.paste(im=imgToPaste,box=(xpos*150,ypos*150))
+    result.save("result.jpeg","JPEG")
     return ''
 
 if __name__=="__main__":
