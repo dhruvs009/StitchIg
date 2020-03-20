@@ -1,11 +1,12 @@
-from flask import Flask, request, Response, json
+from flask import Flask, request, Response, json, send_file
 import requests
 import os
 from dotenv import load_dotenv
 import urllib.request
-from PIL import Image
+from PIL import Image, ImageChops
 import math
 import random
+from io import BytesIO
 
 load_dotenv()
 
@@ -14,6 +15,24 @@ client_secret=os.getenv("CLIENT_SECRET")
 redirect_uri=os.getenv("REDIRECT_URI")
 
 app=Flask(__name__)
+
+sizeOfImage=60
+
+def trim(im):
+    bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
+    diff = ImageChops.difference(im, bg)
+    diff = ImageChops.add(diff, diff, 2.0, -100)
+    bbox = diff.getbbox()
+    if bbox:
+        return im.crop(bbox)
+    else:
+        return im
+
+def processImg(image, imgArray):
+    size=sizeOfImage, sizeOfImage
+    image=trim(image)
+    im_resized=image.resize(size, Image.BICUBIC)
+    imgArray.append(im_resized)
 
 @app.route("/",methods=['GET'])
 def stitchig():
@@ -40,20 +59,16 @@ def stitchig():
         print(response)
         if response['media_type']=="IMAGE":
             image=Image.open(urllib.request.urlopen(response['media_url']))
-            size=150, 150
-            im_resized=image.resize(size, Image.ANTIALIAS)
-            imgArray.append(im_resized)
+            processImg(image,imgArray)
         elif response['media_type']=="CAROUSEL_ALBUM":
             for child in response['children']['data']:
                 rtemp=requests.get(url='https://graph.instagram.com/'+str(child['id'])+'?fields=media_url,media_type,children&access_token='+str(access_token))
                 responsetemp=rtemp.json()
                 image=Image.open(urllib.request.urlopen(responsetemp['media_url']))
-                size=150, 150
-                im_resized=image.resize(size, Image.ANTIALIAS)
-                imgArray.append(im_resized)
+                processImg(image,imgArray)
     n=math.ceil(math.sqrt(len(imgArray)))
     print(n)
-    result=Image.new('RGB',(150*n,150*n),(255,255,255))
+    result=Image.new('RGB',(sizeOfImage*n,sizeOfImage*n))#,(255,255,255))
     pos=[]
     for i in range(n):
         temp=[]
@@ -70,9 +85,11 @@ def stitchig():
         if(len(pos[a])==0):
             pos.pop(a)
         imgArray.pop(c)
-        result.paste(im=imgToPaste,box=(xpos*150,ypos*150))
-    result.save("result.jpeg","JPEG")
-    return ''
+        result.paste(im=imgToPaste,box=(xpos*sizeOfImage,ypos*sizeOfImage))
+    toReturn=BytesIO()
+    result.save(toReturn, 'JPEG', quality=70)
+    toReturn.seek(0)
+    return send_file(toReturn, mimetype='image/jpeg')
 
 if __name__=="__main__":
     app.run(debug=True)
