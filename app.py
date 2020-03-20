@@ -41,7 +41,7 @@ def stitchig():
             'client_id':client_id,
             'client_secret':client_secret,
             'grant_type':'authorization_code',
-            'redirect_uri':'https://dhruvs009.github.io/me/',
+            'redirect_uri':redirect_uri,
             'code':code
         })
     response=r.json()
