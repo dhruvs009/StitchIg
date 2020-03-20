@@ -52,21 +52,23 @@ def stitchig():
                 im_resized=image.resize(size, Image.ANTIALIAS)
                 imgArray.append(im_resized)
     n=math.ceil(math.sqrt(len(imgArray)))
+    print(n)
     result=Image.new('RGB',(150*n,150*n),(255,255,255))
-    x=[0]*n
-    y=[0]*n
+    pos=[]
     for i in range(n):
-        x[i]=i
-        y[i]=i
+        temp=[]
+        for j in range(n):
+            temp.append((i,j))
+        pos.append(temp)
     while(len(imgArray)!=0):
-        a=random.randint(0,len(x)-1)
-        b=random.randint(0,len(y)-1)
+        a=random.randint(0,len(pos)-1)
+        b=random.randint(0,len(pos[a])-1)
         c=random.randint(0,len(imgArray)-1)
         imgToPaste=imgArray[c]
-        xpos=x[a]
-        ypos=y[b]
-        x.pop(a)
-        y.pop(b)
+        xpos,ypos=pos[a][b]
+        pos[a].pop(b)
+        if(len(pos[a])==0):
+            pos.pop(a)
         imgArray.pop(c)
         result.paste(im=imgToPaste,box=(xpos*150,ypos*150))
     result.save("result.jpeg","JPEG")
