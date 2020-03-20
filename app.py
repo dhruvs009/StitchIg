@@ -50,6 +50,11 @@ def stitchig():
                 size=150, 150
                 im_resized=image.resize(size, Image.ANTIALIAS)
                 imgArray.append(im_resized)
+    n=math.ceil(math.sqrt(len(imgArray)))
+    result=Image.new('RGB',(150*n,150*n),(255,255,255))
+    x=[0]*n
+    y=[0]*n
+    
     return ''
 
 if __name__=="__main__":
