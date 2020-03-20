@@ -45,51 +45,50 @@ def stitchig():
             'code':code
         })
     response=r.json()
-    access_token=response['access_token']
-    user_id=response['user_id']
-    r=requests.get(url='https://graph.instagram.com/'+str(user_id)+'/media?fields=id&access_token='+str(access_token))
-    response=r.json()
-    data=response['data']
-    imgArray=[]
-    width=0
-    height=0
-    for row in data:
-        r=requests.get(url='https://graph.instagram.com/'+str(row['id'])+'?fields=media_url,media_type,children&access_token='+str(access_token))
-        response=r.json()
-        print(response)
-        if response['media_type']=="IMAGE":
-            image=Image.open(urllib.request.urlopen(response['media_url']))
-            processImg(image,imgArray)
-        elif response['media_type']=="CAROUSEL_ALBUM":
-            for child in response['children']['data']:
-                rtemp=requests.get(url='https://graph.instagram.com/'+str(child['id'])+'?fields=media_url,media_type,children&access_token='+str(access_token))
-                responsetemp=rtemp.json()
-                image=Image.open(urllib.request.urlopen(responsetemp['media_url']))
-                processImg(image,imgArray)
-    n=math.ceil(math.sqrt(len(imgArray)))
-    print(n)
-    result=Image.new('RGB',(sizeOfImage*n,sizeOfImage*n))#,(255,255,255))
-    pos=[]
-    for i in range(n):
-        temp=[]
-        for j in range(n):
-            temp.append((i,j))
-        pos.append(temp)
-    while(len(imgArray)!=0):
-        a=random.randint(0,len(pos)-1)
-        b=random.randint(0,len(pos[a])-1)
-        c=random.randint(0,len(imgArray)-1)
-        imgToPaste=imgArray[c]
-        xpos,ypos=pos[a][b]
-        pos[a].pop(b)
-        if(len(pos[a])==0):
-            pos.pop(a)
-        imgArray.pop(c)
-        result.paste(im=imgToPaste,box=(xpos*sizeOfImage,ypos*sizeOfImage))
-    toReturn=BytesIO()
-    result.save(toReturn, 'JPEG', quality=70)
-    toReturn.seek(0)
-    return send_file(toReturn, mimetype='image/jpeg')
+    return response
+    # access_token=response['access_token']
+    # user_id=response['user_id']
+    # r=requests.get(url='https://graph.instagram.com/'+str(user_id)+'/media?fields=id&access_token='+str(access_token))
+    # response=r.json()
+    # data=response['data']
+    # imgArray=[]
+    # width=0
+    # height=0
+    # for row in data:
+    #     r=requests.get(url='https://graph.instagram.com/'+str(row['id'])+'?fields=media_url,media_type,children&access_token='+str(access_token))
+    #     response=r.json()
+    #     if response['media_type']=="IMAGE":
+    #         image=Image.open(urllib.request.urlopen(response['media_url']))
+    #         processImg(image,imgArray)
+    #     elif response['media_type']=="CAROUSEL_ALBUM":
+    #         for child in response['children']['data']:
+    #             rtemp=requests.get(url='https://graph.instagram.com/'+str(child['id'])+'?fields=media_url,media_type,children&access_token='+str(access_token))
+    #             responsetemp=rtemp.json()
+    #             image=Image.open(urllib.request.urlopen(responsetemp['media_url']))
+    #             processImg(image,imgArray)
+    # n=math.ceil(math.sqrt(len(imgArray)))
+    # result=Image.new('RGB',(sizeOfImage*n,sizeOfImage*n))#,(255,255,255))
+    # pos=[]
+    # for i in range(n):
+    #     temp=[]
+    #     for j in range(n):
+    #         temp.append((i,j))
+    #     pos.append(temp)
+    # while(len(imgArray)!=0):
+    #     a=random.randint(0,len(pos)-1)
+    #     b=random.randint(0,len(pos[a])-1)
+    #     c=random.randint(0,len(imgArray)-1)
+    #     imgToPaste=imgArray[c]
+    #     xpos,ypos=pos[a][b]
+    #     pos[a].pop(b)
+    #     if(len(pos[a])==0):
+    #         pos.pop(a)
+    #     imgArray.pop(c)
+    #     result.paste(im=imgToPaste,box=(xpos*sizeOfImage,ypos*sizeOfImage))
+    # toReturn=BytesIO()
+    # result.save(toReturn, 'JPEG', quality=70)
+    # toReturn.seek(0)
+    # return send_file(toReturn, mimetype='image/jpeg')
 
 if __name__=="__main__":
     app.run(debug=True)
