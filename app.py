@@ -17,6 +17,7 @@ redirect_uri=os.getenv("REDIRECT_URI")
 app=Flask(__name__)
 
 sizeOfImage=60
+sizeOfResult=196
 
 def trim(im):
     bg = Image.new(im.mode, im.size, im.getpixel((0,0)))
@@ -24,8 +25,22 @@ def trim(im):
     diff = ImageChops.add(diff, diff, 2.0, -100)
     bbox = diff.getbbox()
     if bbox:
-        return im.crop(bbox)
+        im=im.crop(bbox)
+        im=getSquareMid(im)
+        return im
     else:
+        return im
+
+def getSquareMid(im):
+    width, height=im.size
+    if width==height:
+        return im
+    else:
+        if width<height:
+            crop_rectangle=(0,(height-width)//2,width,height-(height-width)//2)
+        else:
+            crop_rectangle=((width-height)//2,0,width-(width-height)//2,height)
+        im=im.crop(crop_rectangle)
         return im
 
 def processImg(image, imgArray):
@@ -45,6 +60,7 @@ def stitchig():
             'code':code
         })
     response=r.json()
+    print(response)
     access_token=response['access_token']
     user_id=response['user_id']
     r=requests.get(url='https://graph.instagram.com/'+str(user_id)+'/media?fields=id&access_token='+str(access_token))
@@ -85,6 +101,7 @@ def stitchig():
         imgArray.pop(c)
         result.paste(im=imgToPaste,box=(xpos*sizeOfImage,ypos*sizeOfImage))
     toReturn=BytesIO()
+    result=result.resize((sizeOfResult,sizeOfResult),Image.BICUBIC)
     result.save(toReturn, 'JPEG', quality=70)
     toReturn.seek(0)
     return send_file(toReturn, mimetype='image/jpeg')
