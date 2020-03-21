@@ -60,7 +60,6 @@ def stitchig():
             'code':code
         })
     response=r.json()
-    print(response)
     access_token=response['access_token']
     user_id=response['user_id']
     r=requests.get(url='https://graph.instagram.com/'+str(user_id)+'/media?fields=id&access_token='+str(access_token))
