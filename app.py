@@ -81,7 +81,7 @@ def stitchig():
                 responsetemp=rtemp.json()
                 image=Image.open(urllib.request.urlopen(responsetemp['media_url']))
                 processImg(image,imgArray)
-    n=math.ceil(math.sqrt(len(imgArray)))
+    n=math.floor(math.sqrt(len(imgArray)))
     result=Image.new('RGB',(sizeOfImage*n,sizeOfImage*n))#,(255,255,255))
     pos=[]
     for i in range(n):
@@ -89,7 +89,7 @@ def stitchig():
         for j in range(n):
             temp.append((i,j))
         pos.append(temp)
-    while(len(imgArray)!=0):
+    while(len(imgArray)!=0 and len(pos)!=0):
         a=random.randint(0,len(pos)-1)
         b=random.randint(0,len(pos[a])-1)
         c=random.randint(0,len(imgArray)-1)
