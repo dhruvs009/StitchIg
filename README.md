@@ -1,5 +1,7 @@
 # StitchIg!
 
+<img src="https://raw.githubusercontent.com/dhruvs009/StitchIg/master/logo.png" width="500"></img>
+
 A simple web application that fetches images from your Instagram feed (requires authentication from your Instagram account) and returns a stitched 196x196 image in a square grid, with square thumbnails of these images. Adios.
 
 ### How to use (doesn't work yet, this application needs permissions from Instagram): 
